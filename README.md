@@ -1,5 +1,5 @@
-# Bigdata docker compose
-Deploy bigdata components using docker compose. 
+# Bigdata with docker compose
+Deploy big data components using docker compose. 
 
 ## Supported components
 
