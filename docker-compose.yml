@@ -1,0 +1,136 @@
+version: "3"
+
+services:
+  namenode:
+    image: bde2020/hadoop-namenode
+    container_name: namenode
+    ports:
+      - 9870:9870
+      - 9000:9000
+    environment:
+      - CLUSTER_NAME=Qbit
+    env_file:
+      - ./hadoop.env
+
+  datanode:
+    image: bde2020/hadoop-datanode
+    container_name: datanode
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+  
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager
+    container_name: resourcemanager
+    ports:
+      - 8088:8088
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864"
+    env_file:
+      - ./hadoop.env
+
+  nodemanager:
+    image: bde2020/hadoop-nodemanager
+    container_name: nodemanager
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+  
+  historyserver:
+    image: bde2020/hadoop-historyserver
+    container_name: historyserver
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+  hive-metastore:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    volumes:
+      - /data/tools:/tools
+    env_file:
+      - ./hadoop.env
+    command: /opt/hive/bin/hive --service metastore
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 hive-metastore-postgresql:5432"
+    ports:
+      - "9083:9083"
+  hive-metastore-postgresql:
+    image: bde2020/hive-metastore-postgresql:2.3.0
+    volumes:
+      - /data/tools:/tools
+  elasticsearch:
+    image: elasticsearch:7.9.1
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - action.destructive_requires_name=true
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+  kibana:
+    image: kibana:7.9.1
+    ports:
+      - "5601:5601"
+  hbase-master:
+    image: harisekhon/hbase:${VERSION:-latest}
+    command: master
+    ports:
+      - 16000:16000
+      - 16010:16010
+  hbase-regionserver:
+    image: harisekhon/hbase:${VERSION:-latest}
+    command: regionserver
+    ports:
+      - 16030:16030
+      - 16201:16201
+      - 16301:16301
+  hbase-thrift:
+    image: harisekhon/hbase:${VERSION:-latest}
+    command: thrift
+    ports:
+      - 9090:9090
+      - 9095:9095
+  hbase-stargate:
+    image: harisekhon/hbase:${VERSION:-latest}
+    command: stargate
+    ports:
+      - 8080:8080
+      - 8085:8085
+  zookeeper:
+    image: harisekhon/zookeeper:latest
+    ports:
+      - 2181:2181
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 10.116.200.25
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "arkuser:1:1, arkevent:1:1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock    
+  prestodb:
+    image: vimagick/prestodb:debian
+    ports:
+      - "9999:8080"
+    volumes:
+      - ./conf/standalone:/opt/presto/etc:ro
+      - /data/presto:/data
+    restart: unless-stopped
