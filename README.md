@@ -7,7 +7,7 @@ Deploy big data components using docker compose.
 * Prestodb 0.239.1
 * Kafka 1.1.0
 * Hbase 0.92.2
-* Hive 2.3.2
+* Hive 3.1.2
 * ELK 7.9.1
 ## How to Run
 
@@ -39,7 +39,7 @@ Install docker-compose:
 
 ## ToDo
 1. Integration flink 1.12
-2. Integration hive 3.1
+2. ~~Integration hive 3.1 (Done)~~
 3. Integration hbase 2.2
 4. Integration iceberg
 5. Integration alluxio

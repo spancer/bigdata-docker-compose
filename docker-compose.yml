@@ -46,7 +46,8 @@ services:
     env_file:
       - ./hadoop.env
   hive-metastore:
-    image: bde2020/hive:2.3.2-postgresql-metastore
+    image: coomia/hive3.1.2:0.2
+    container_name: hive-metastore
     volumes:
       - /data/tools:/tools
     env_file:
@@ -57,9 +58,16 @@ services:
     ports:
       - "9083:9083"
   hive-metastore-postgresql:
-    image: bde2020/hive-metastore-postgresql:2.3.0
-    volumes:
-      - /data/tools:/tools
+    image: bde2020/hive-metastore-postgresql:3.1.0
+  hive-server:
+    image: coomia/hive3.1.2:0.2
+    env_file:
+      - ./hadoop.env
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+    ports:
+      - "10000:10000"
   elasticsearch:
     image: elasticsearch:7.9.1
     environment:
