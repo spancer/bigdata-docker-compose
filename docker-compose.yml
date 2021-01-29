@@ -102,6 +102,7 @@ services:
     
   elasticsearch:
     image: elasticsearch:7.9.1
+    container_name: elasticsearch
     environment:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
@@ -122,6 +123,7 @@ services:
         hard: 65536
   kibana:
     image: kibana:7.9.1
+    container_name: kibana
     ports:
       - "5601:5601"
   
