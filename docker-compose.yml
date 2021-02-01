@@ -128,7 +128,7 @@ services:
       - "5601:5601"
   
   jobmanager:
-    image: coomia/flink1.11.3-bdp-embedded:0.1
+    image: coomia/flink1.11.3-yarn-embedded:0.1
     container_name: jobmanager
     expose:
       - "6123"
@@ -138,7 +138,7 @@ services:
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
   taskmanager:
-    image: coomia/flink1.11.3-bdp-embedded:0.1
+    image: coomia/flink1.11.3-yarn-embedded:0.1
     container_name: taskmanager
     expose:
       - "6121"
