@@ -14,11 +14,10 @@ services:
 
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: datanode
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
     ports:
-      - 9864:9864
+      - "9864"
     env_file:
       - ./hadoop.env
   
@@ -34,7 +33,6 @@ services:
 
   nodemanager:
     image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
-    container_name: nodemanager
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
     env_file:
