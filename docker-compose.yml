@@ -151,3 +151,29 @@ services:
       - "jobmanager:jobmanager"
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
+      
+  hbase-master:
+    image: harisekhon/hbase:2.0
+    command: master
+    ports:
+      - 16000:16000
+      - 16010:16010
+  hbase-regionserver:
+    image: harisekhon/hbase:2.0
+    command: regionserver
+    ports:
+      - 16030:16030
+      - 16201:16201
+      - 16301:16301
+  hbase-thrift:
+    image: harisekhon/hbase:2.0
+    command: thrift
+    ports:
+      - 9090:9090
+      - 9095:9095
+  hbase-stargate:
+    image: harisekhon/hbase:2.0
+    command: stargate
+    ports:
+      - 8080:8080
+      - 8085:8085
