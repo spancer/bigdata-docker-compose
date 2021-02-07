@@ -10,6 +10,13 @@ filebeat.inputs:
 
 output.elasticsearch:
   hosts: ["elasticsearch:9200"]
+  indices:
+    - index: "warning-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.contains:
+        message: "WARN"
+    - index: "error-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.contains:
+        message: "ERR"
 
 setup.kibana:
   host: "kibana:5601"
