@@ -1,0 +1,15 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.inputs:
+- type: log
+  paths:
+    - /usr/share/filebeat/mydocs/test.log
+
+output.elasticsearch.hosts:
+  hosts: ["elasticsearch:9200"]
+
+setup.kibana:
+  host: "kibana:5601"

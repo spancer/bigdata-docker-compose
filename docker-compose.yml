@@ -129,7 +129,25 @@ services:
     container_name: kibana
     ports:
       - "5601:5601"
-  
+    environment:
+      I18N_LOCALE: zh-CN
+    restart: always
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+      
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.9.1
+    hostname: filebeat
+    container_name: filebeat
+    volumes:
+      - ./elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./elk/filebeat/logs:/usr/share/filebeat/logs
+      - ./elk/filebeat/mydocs:/usr/share/filebeat/mydocs
+    environment:
+      - TZ=Asia/Shanghai
+ 
   jobmanager:
     image: coomia/flink1.11.3-yarn-embedded:0.1
     container_name: jobmanager
@@ -140,6 +158,7 @@ services:
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
+
   taskmanager:
     image: coomia/flink1.11.3-yarn-embedded:0.1
     container_name: taskmanager
