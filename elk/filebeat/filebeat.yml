@@ -8,7 +8,7 @@ filebeat.inputs:
   paths:
     - /usr/share/filebeat/mydocs/test.log
 
-output.elasticsearch.hosts:
+output.elasticsearch:
   hosts: ["elasticsearch:9200"]
 
 setup.kibana:
