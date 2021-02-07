@@ -144,7 +144,6 @@ services:
     volumes:
       - ./elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - ./elk/filebeat/logs:/usr/share/filebeat/logs
-      - ./elk/filebeat/mydocs:/usr/share/filebeat/mydocs
     environment:
       - TZ=Asia/Shanghai
  

@@ -6,7 +6,7 @@ filebeat.config:
 filebeat.inputs:
 - type: log
   paths:
-    - /usr/share/filebeat/mydocs/test.log
+    - /usr/share/filebeat/logs/access.log
 
 output.elasticsearch:
   hosts: ["elasticsearch:9200"]
