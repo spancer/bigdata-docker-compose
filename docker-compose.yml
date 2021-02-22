@@ -2,7 +2,7 @@ version: "3"
 
 services:
   namenode:
-    image: coomia/hadoop3.2-namenode:0.1
+    image: umxwe/hadoop3.1-namenode:0.1
     container_name: namenode
     ports:
       - 9870:9870
@@ -13,7 +13,7 @@ services:
       - ./hadoop.env
 
   datanode:
-    image: coomia/hadoop3.2-datanode:0.1
+    image: umxwe/hadoop3.1-datanode:0.1
     container_name: datanode
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
@@ -23,7 +23,7 @@ services:
       - ./hadoop.env
   
   resourcemanager:
-    image: coomia/hadoop3.2-resourcemanager:0.1
+    image: umxwe/hadoop3.1-resourcemanager:0.1
     container_name: resourcemanager
     ports:
       - 8088:8088
@@ -33,7 +33,7 @@ services:
       - ./hadoop.env
 
   nodemanager:
-    image: coomia/hadoop3.2-nodemanager:0.1
+    image: umxwe/hadoop3.1-nodemanager:0.1
     container_name: nodemanager
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
@@ -41,7 +41,7 @@ services:
       - ./hadoop.env
   
   historyserver:
-    image: coomia/hadoop3.2-historyserver:0.1
+    image: umxwe/hadoop3.1-historyserver:0.1
     container_name: historyserver
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
@@ -49,7 +49,7 @@ services:
       - ./hadoop.env
 
   hive-metastore:
-    image: coomia/hive3.1.2:0.1
+    image: umxwe/hive3.1.2-hadoop3.1:0.1
     container_name: hive-metastore
     volumes:
       - /data/tools:/tools
@@ -61,10 +61,10 @@ services:
     ports:
       - "9083:9083"
   hive-metastore-pg:
-    image: coomia/hive3.1-metastore-pg:0.1
+    image: umxwe/hive3.1-metastore-pg:0.1
     container_name: hive-metastore-pg
   hive-server:
-    image: coomia/hive3.1.2:0.1
+    image: umxwe/hive3.1.2-hadoop3.1:0.1
     container_name: hive-server
     env_file:
       - ./hadoop.env
@@ -75,7 +75,7 @@ services:
       - "10000:10000"
 
   zookeeper:
-    image: coomia/zookeeper:0.1
+    image: umxwe/zookeeper:0.1
     container_name: zookeeper
     ports:
       - 2181:2181
@@ -94,7 +94,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock    
   prestodb:
-    image: vimagick/prestodb:debian
+    image: umxwe/prestodb:0.1
     container_name: prestodb
     ports:
       - "9999:8080"
@@ -146,9 +146,47 @@ services:
       - ./elk/filebeat/logs:/usr/share/filebeat/logs
     environment:
       - TZ=Asia/Shanghai
- 
+
+  hbase-master:
+    image: coomia/hbase2.2:0.1
+    container_name: hbase-master
+    command: master
+    ports:
+      - 16000:16000
+      - 16010:16010
+    depends_on:
+      - zookeeper
+      
+  hbase-regionserver:
+    image: coomia/hbase2.2:0.1
+    container_name: hbase-regionserver
+    command: regionserver
+    ports:
+      - 16030:16030
+      - 16201:16201
+      - 16301:16301
+    depends_on:
+      - zookeeper
+  hbase-thrift:
+    image: coomia/hbase2.2:0.1
+    container_name: hbase-thrift
+    command: thrift
+    ports:
+      - 9090:9090
+      - 9095:9095
+    depends_on:
+      - zookeeper
+  hbase-stargate:
+    image: coomia/hbase2.2:0.1
+    container_name: hbase-stargate
+    command: stargate
+    ports:
+      - 8080:8080
+      - 8085:8085
+    depends_on:
+      - zookeeper
   jobmanager:
-    image: coomia/flink1.11.3-yarn-embedded:0.1
+    image: umxwe/flink1.11-yarn3.1:0.1
     container_name: jobmanager
     expose:
       - "6123"
@@ -159,7 +197,7 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
 
   taskmanager:
-    image: coomia/flink1.11.3-yarn-embedded:0.1
+    image: umxwe/flink1.11-yarn3.1:0.1
     container_name: taskmanager
     expose:
       - "6121"
@@ -171,33 +209,3 @@ services:
       - "jobmanager:jobmanager"
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-      
-  hbase-master:
-    image: harisekhon/hbase:2.0
-    container_name: hbase-master
-    command: master
-    ports:
-      - 16000:16000
-      - 16010:16010
-  hbase-regionserver:
-    image: harisekhon/hbase:2.0
-    container_name: hbase-regionserver
-    command: regionserver
-    ports:
-      - 16030:16030
-      - 16201:16201
-      - 16301:16301
-  hbase-thrift:
-    image: harisekhon/hbase:2.0
-    container_name: hbase-thrift
-    command: thrift
-    ports:
-      - 9090:9090
-      - 9095:9095
-  hbase-stargate:
-    image: harisekhon/hbase:2.0
-    container_name: hbase-stargate
-    command: stargate
-    ports:
-      - 8080:8080
-      - 8085:8085
