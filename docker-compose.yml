@@ -146,9 +146,8 @@ services:
       - ./elk/filebeat/logs:/usr/share/filebeat/logs
     environment:
       - TZ=Asia/Shanghai
-
   hbase-master:
-    image: coomia/hbase2.2:0.1
+    image: umxwe/hbase2.2:0.1
     container_name: hbase-master
     command: master
     ports:
@@ -158,7 +157,7 @@ services:
       - zookeeper
       
   hbase-regionserver:
-    image: coomia/hbase2.2:0.1
+    image: umxwe/hbase2.2:0.1
     container_name: hbase-regionserver
     command: regionserver
     ports:
@@ -167,8 +166,9 @@ services:
       - 16301:16301
     depends_on:
       - zookeeper
+      - hbase-master
   hbase-thrift:
-    image: coomia/hbase2.2:0.1
+    image: umxwe/hbase2.2:0.1
     container_name: hbase-thrift
     command: thrift
     ports:
@@ -177,7 +177,7 @@ services:
     depends_on:
       - zookeeper
   hbase-stargate:
-    image: coomia/hbase2.2:0.1
+    image: umxwe/hbase2.2:0.1
     container_name: hbase-stargate
     command: stargate
     ports:
