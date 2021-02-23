@@ -4,9 +4,9 @@ Deploy big data components using docker compose.
 ## Supported components
 
 * Apache Hadoop 3.2
-* Prestodb 0.239.1
-* Kafka 1.1.0
-* Hbase 0.92.2
+* Prestodb 0.247
+* Kafka 2+
+* Hbase 2.2
 * Hive 3.1.2
 * ELK 7.9.1
 ## How to Run
@@ -35,6 +35,14 @@ Install docker-compose:
 2. sudo chmod +x /usr/local/bin/docker-compose
 
 3. docker-compose --version
+```
+
+## How to test prestodb to confirm whether it works?
+```
+1. cd the prestodb container: docker-compose exec prestodb bash
+2. connect to presto using presto-client: presto --server prestodb:8080 --catalog elasticsearch 
+3. query some data: show schemas; show tables; select * from nodes;
+4. you can also verify presto status through web ui: http://your-host-ip:9999
 ```
 
 ## ToDo
