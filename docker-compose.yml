@@ -172,31 +172,41 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
       
   hbase-master:
-    image: harisekhon/hbase:2.0
+    image: coomia/hbase2.2:0.1
     container_name: hbase-master
     command: master
     ports:
       - 16000:16000
       - 16010:16010
+    depends_on:
+      - zookeeper
+      
   hbase-regionserver:
-    image: harisekhon/hbase:2.0
+    image: coomia/hbase2.2:0.1
     container_name: hbase-regionserver
     command: regionserver
     ports:
       - 16030:16030
       - 16201:16201
       - 16301:16301
+    depends_on:
+      - zookeeper
+      - hbase-master
   hbase-thrift:
-    image: harisekhon/hbase:2.0
+    image: coomia/hbase2.2:0.1
     container_name: hbase-thrift
     command: thrift
     ports:
       - 9090:9090
       - 9095:9095
+    depends_on:
+      - zookeeper
   hbase-stargate:
-    image: harisekhon/hbase:2.0
+    image: coomia/hbase2.2:0.1
     container_name: hbase-stargate
     command: stargate
     ports:
       - 8080:8080
       - 8085:8085
+    depends_on:
+      - zookeeper
