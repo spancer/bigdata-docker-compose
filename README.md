@@ -48,7 +48,7 @@ Install docker-compose:
 ## ToDo
 1. Integration flink 1.12
 2. ~~Integration hive 3.1 (Done)~~
-3. Integration hbase 2.2
-4. Integration iceberg
+3. ~~Integration hbase 2.2~~
+4. ~~Integration iceberg~~
 5. Integration alluxio
 6. Integration ozone
