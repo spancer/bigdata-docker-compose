@@ -37,6 +37,74 @@ Install docker-compose:
 3. docker-compose --version
 ```
 
+## How to visit services in web ui?
+```
+HDFS: http://namenode:9870/
+YARN: http://resourcemanager:8088/
+ES：http://elasticsearch:9200/
+Kibana:http://kibana:5601/
+Presto: http://prestodb:9999/
+Hbase: http://hbase-master:16010/
+Flink:http://jobmanager:8081/ (you have to start a yarn-session firstly)
+```
+Note: you have to add the server ip and services (which defined in docker-compose.yml) to your local hosts firstly. [how to configure hosts](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/)
+
+## Produce some data to test HDFS & Hive
+
+ <pre>
+   create a table in hive:
+
+   ```hive sql
+   ccreate external table test(
+    id      int
+   ,name    string
+   ,skills   array<string>
+   ,add     map<String,string>
+    )
+    row format delimited
+    fields terminated by ','
+    collection items terminated by '-'
+    map keys terminated by ':'
+    location '/user/test'
+   ```
+   </pre>
+
+<pre>
+
+create a txt file with the content below, put it under /data/ directory, such as
+/data/example.txt
+
+```
+1,spancer,bigdata-ai-devops,changsha:lugu-changsha:chuanggu
+2,jack,webdev-microservices,shenzhen:nanshan-usa:la
+3,james,android-flutter,beijing:chaoyang
+3,james,ios-flutter,beijing:chaoyang
+```
+</pre>
+
+<pre>
+
+load local file data into the external hive table, which we created above.
+
+```
+load data local inpath ‘/tools/example.txt’ overwrite into table test; 
+
+```
+</pre>
+
+
+<pre>
+
+Check the mr job in yarn web ui :http://resourcemanager:8088/
+
+After the job is done, query in hive client. Alternative, we can query the data in presto client.
+
+```
+select * from test;
+```
+</pre>
+
+
 ## How to test prestodb to confirm whether it works?
 ```
 1. cd the prestodb container: docker-compose exec prestodb bash
