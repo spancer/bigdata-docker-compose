@@ -38,14 +38,14 @@ Install docker-compose:
 ```
 
 ## How to visit services in web ui?
-```
-HDFS: http://namenode:9870/
-YARN: http://resourcemanager:8088/
-ES：http://elasticsearch:9200/
-Kibana:http://kibana:5601/
-Presto: http://prestodb:9999/
-Hbase: http://hbase-master:16010/
-Flink:http://jobmanager:8081/ (you have to start a yarn-session firstly)
+
+* HDFS: http://namenode:9870/
+* YARN: http://resourcemanager:8088/
+* ES：http://elasticsearch:9200/
+* Kibana:http://kibana:5601/
+* Presto: http://prestodb:9999/
+* Hbase: http://hbase-master:16010/
+* Flink:http://jobmanager:8081/ (you have to start a yarn-session firstly)
 ```
 Note: you have to add the server ip and services (which defined in docker-compose.yml) to your local hosts firstly. [how to configure hosts](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/)
 
@@ -55,7 +55,7 @@ Note: you have to add the server ip and services (which defined in docker-compos
    create a table in hive:
 
    ```hive sql
-   ccreate external table test(
+   create external table test(
     id      int
    ,name    string
    ,skills   array<string>
