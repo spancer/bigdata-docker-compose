@@ -87,7 +87,7 @@ create a txt file with the content below, put it under /data/ directory, such as
 load local file data into the external hive table, which we created above.
 
 ```
-load data local inpath ‘/tools/example.txt’ overwrite into table test; 
+load data local inpath '/tools/example.txt' overwrite into table test; 
 
 ```
 </pre>
@@ -102,6 +102,54 @@ After the job is done, query in hive client. Alternative, we can query the data 
 ```
 select * from test;
 ```
+</pre>
+
+## Testing HBase
+
+<pre>
+create a table named as person, with two column families, info and tags.
+
+```
+create 'person', 'info','tags'
+```
+
+list tables in HBase
+```
+list
+```
+describe table person
+
+```
+describe 'person'
+```
+
+Insert some data into table person with rowkey 1.
+
+```
+put 'person','1','info:name','spancer'
+put 'person','1','info:age','36'
+put 'person', '1', 'tags:skill','bigdata'
+```
+
+scan table person
+```
+scan 'person'
+```
+
+get data by rowkey
+```
+get 'person','1'
+
+```
+get data by rowkey and column family or column.
+
+```
+get 'person','1'
+
+get 'person','1','info'
+
+get 'person','1','info:name'
+
 </pre>
 
 
