@@ -1,5 +1,6 @@
 # Bigdata with docker compose
-Deploy big data components using docker compose. 
+Deploy big data components using docker compose.  You can use docker to set up Hadoop 3+, HBase 2+, Hive 3+, Kafka 2+, Prestodb 0.247+, Flink 1.11+, ELK 7.9+ in minutes.
+Integration tests between Hadoop and Hive,  Hadoop and HBase, Flink on yarn, Prestodb against Kafka, Elasticsearch, HBase, Hive had been covered. You can used it in development evironment to test your applications, but it's not recommand to use in production.
 
 ## Supported components
 
@@ -87,7 +88,7 @@ create a txt file with the content below, put it under /data/ directory, such as
 load local file data into the external hive table, which we created above.
 
 ```
-load data local inpath '/tools/example.txt' overwrite into table test; 
+load data local inpath '/tools/example.txt'overwrite into table test; 
 
 ```
 </pre>
