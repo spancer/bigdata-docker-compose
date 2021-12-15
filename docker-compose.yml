@@ -169,7 +169,7 @@ services:
 
   alluxio-master:
     image: coomia/alluxio:2.7.1
-    hostname: alluxio-master
+    container_name: alluxio-master
     volumes:
       - alluxio-journal:/opt/alluxio/journal
       - alluxio-ufs:/opt/alluxio/underFSStorage/
@@ -189,7 +189,7 @@ services:
 
   alluxio-worker:
     image: coomia/alluxio:2.7.1
-    hostname: alluxio-worker
+    container_name: alluxio-worker
     volumes:
       - alluxio-ufs:/opt/alluxio/underFSStorage/
       - alluxio-worker-data:/alluxio-worker-data
@@ -203,7 +203,7 @@ services:
 
   alluxio-proxy:
     image: coomia/alluxio:2.7.1
-    hostname: alluxio-proxy
+    container_name: alluxio-proxy
     user: root
     command: proxy
     environment:
