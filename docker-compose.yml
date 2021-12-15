@@ -1,7 +1,7 @@
 version: "3"
 services:
   namenode:
-    image: coomia/hadoop3.2-namenode:0.1
+    image: coomia/hadoop3.2-namenode:0.2
     container_name: namenode
     ports:
       - 9870:9870
@@ -12,7 +12,7 @@ services:
       - ./hadoop.env
 
   datanode:
-    image: coomia/hadoop3.2-datanode:0.1
+    image: coomia/hadoop3.2-datanode:0.2
     container_name: datanode
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
@@ -22,7 +22,7 @@ services:
       - ./hadoop.env
   
   resourcemanager:
-    image: coomia/hadoop3.2-resourcemanager:0.1
+    image: coomia/hadoop3.2-resourcemanager:0.2
     container_name: resourcemanager
     ports:
       - 8088:8088
@@ -32,7 +32,7 @@ services:
       - ./hadoop.env
 
   nodemanager:
-    image: coomia/hadoop3.2-nodemanager:0.1
+    image: coomia/hadoop3.2-nodemanager:0.2
     container_name: nodemanager
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
@@ -40,7 +40,7 @@ services:
       - ./hadoop.env
   
   historyserver:
-    image: coomia/hadoop3.2-historyserver:0.1
+    image: coomia/hadoop3.2-historyserver:0.2
     container_name: historyserver
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
@@ -147,7 +147,7 @@ services:
       - TZ=Asia/Shanghai
  
   jobmanager:
-    image: coomia/flink1.11.3-yarn-embedded:0.1
+    image: coomia/flink1.14.0:0.2
     container_name: jobmanager
     expose:
       - "6123"
@@ -158,7 +158,7 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
 
   taskmanager:
-    image: coomia/flink1.11.3-yarn-embedded:0.1
+    image: coomia/flink1.14.0:0.2
     container_name: taskmanager
     expose:
       - "6121"
@@ -210,3 +210,54 @@ services:
       - 8085:8085
     depends_on:
       - zookeeper
+
+  alluxio-master:
+    image: coomia/alluxio
+    hostname: alluxio-master
+    volumes:
+      - alluxio-journal:/opt/alluxio/journal
+      - alluxio-ufs:/opt/alluxio/underFSStorage/
+    user: root
+    entrypoint: [ bash, -xeuc ]
+    environment:
+      - ALLUXIO_JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=45.0
+    command:
+      - |
+        JOURNAL_FOLDER=$$(alluxio getConf alluxio.master.journal.folder)
+        if [ ! -d "$$JOURNAL_FOLDER" ]; then
+          alluxio formatJournal
+        fi
+        exec /entrypoint.sh master --no-format
+    ports:
+      - 19999:19999
+
+  alluxio-worker:
+    image: dpp/alluxio
+    hostname: alluxio-worker
+    volumes:
+      - alluxio-ufs:/opt/alluxio/underFSStorage/
+      - alluxio-worker-data:/alluxio-worker-data
+    user: root
+    command: worker --no-format
+    environment:
+      - ALLUXIO_JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=45.0
+      - ALLUXIO_WORKER_TIEREDSTORE_LEVEL0_DIRS_PATH=/alluxio-worker-data
+    depends_on:
+      - alluxio-master
+
+  alluxio-proxy:
+    image: dpp/alluxio
+    hostname: alluxio-proxy
+    user: root
+    command: proxy
+    environment:
+      - ALLUXIO_JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0
+    ports:
+      - 39999:39999
+    depends_on:
+      - alluxio-master
+      
+volumes:
+  alluxio-worker-data:
+  alluxio-ufs:
+  alluxio-journal:
