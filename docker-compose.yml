@@ -101,50 +101,6 @@ services:
       - ./conf/standalone:/opt/presto/etc:ro
       - /data/presto:/data
     restart: unless-stopped
-    
-  elasticsearch:
-    image: elasticsearch:7.9.1
-    container_name: elasticsearch
-    environment:
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=true
-      - action.destructive_requires_name=true
-      - http.cors.enabled=true
-      - http.cors.allow-origin=*
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - discovery.type=single-node
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-  kibana:
-    image: kibana:7.9.1
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    environment:
-      I18N_LOCALE: zh-CN
-    restart: always
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-      
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:7.9.1
-    hostname: filebeat
-    container_name: filebeat
-    volumes:
-      - ./elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - ./elk/filebeat/logs:/usr/share/filebeat/logs
-    environment:
-      - TZ=Asia/Shanghai
  
   jobmanager:
     image: coomia/flink1.14.0:0.2
@@ -212,7 +168,7 @@ services:
       - zookeeper
 
   alluxio-master:
-    image: coomia/alluxio
+    image: coomia/alluxio:2.7.1
     hostname: alluxio-master
     volumes:
       - alluxio-journal:/opt/alluxio/journal
@@ -232,7 +188,7 @@ services:
       - 19999:19999
 
   alluxio-worker:
-    image: dpp/alluxio
+    image: coomia/alluxio:2.7.1
     hostname: alluxio-worker
     volumes:
       - alluxio-ufs:/opt/alluxio/underFSStorage/
@@ -246,7 +202,7 @@ services:
       - alluxio-master
 
   alluxio-proxy:
-    image: dpp/alluxio
+    image: coomia/alluxio:2.7.1
     hostname: alluxio-proxy
     user: root
     command: proxy
@@ -256,6 +212,50 @@ services:
       - 39999:39999
     depends_on:
       - alluxio-master
+
+  elasticsearch:
+    image: elasticsearch:7.9.1
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - action.destructive_requires_name=true
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+  kibana:
+    image: kibana:7.9.1
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      I18N_LOCALE: zh-CN
+    restart: always
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+      
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.9.1
+    hostname: filebeat
+    container_name: filebeat
+    volumes:
+      - ./elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./elk/filebeat/logs:/usr/share/filebeat/logs
+    environment:
+      - TZ=Asia/Shanghai
       
 volumes:
   alluxio-worker-data:
