@@ -44,7 +44,7 @@ Install docker-compose:
 
 * HDFS: http://namenode:9870/
 * YARN: http://resourcemanager:8088/
-* ESï¼šhttp://elasticsearch:9200/
+* ES£ºhttp://elasticsearch:9200/
 * Kibana:http://kibana:5601/
 * Presto: http://prestodb:9999/
 * Hbase: http://hbase-master:16010/
@@ -69,7 +69,7 @@ Note: you have to add the server ip and services (which defined in docker-compos
     collection items terminated by '-'
     map keys terminated by ':'
     location '/user/test'
-   ```
+```
    </pre>
 
 <pre>
@@ -163,12 +163,30 @@ get 'person','1','info:name'
 3. query some data: show schemas; show tables; select * from nodes;
 4. you can also verify presto status through web ui: http://your-host-ip:9999
 ```
+
+## Testing Alluxio
+It's pretty simple to test alluxio. Go to http://alluxio-master:19999  to check the status of alluxio.  And you can mount HDFS file to alluxio from alluxio client like below:
+```
+	1. docker-compose exec alluxio-master bash
+	2. alluxio fs mount /alluxio-dir hdfs://namenode:9000/somedir
+	3. check files from http://alluxio-master:19999 or from alluxio client.
+	4. alluxio fs ls /alluxio-dir
+```
+Altnatively, you can test the intergation with flink.  Just  follow the step:
+```
+1. docker-compose exec jobmanager bash
+2. cd /opt/flink/bin
+3. flink run ../examples/batch/WordCount.jar \
+  --input alluxio://alluxio-master:19998/LICENSE \
+  --output alluxio://alluxio-master:19998/output
+4. 
+
 ## Run jobs on the docker platform.
 
 For java developers, I provide some tests over the platform. You can fork it from [here](https://github.com/spancer/flink-iceberg-demo), the test project
 contains flink jobs with set of components, such as kafka, elasticsearch, iceberg, etc.. Source and sink examples are fully inclued.
 
-## What we've done.
+## ToDo
 1. ~~Integration flink 1.14~~
 2. ~~Integration hive 3.1 (Done)~~
 3. ~~Integration hbase 2.2~~
