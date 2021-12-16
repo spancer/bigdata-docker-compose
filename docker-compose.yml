@@ -1,7 +1,7 @@
 version: "3"
 services:
   namenode:
-    image: coomia/hadoop3.2-namenode:0.2
+    image: coomia/hadoop3.2-namenode:1.0
     container_name: namenode
     ports:
       - 9870:9870
@@ -12,7 +12,7 @@ services:
       - ./hadoop.env
 
   datanode:
-    image: coomia/hadoop3.2-datanode:0.2
+    image: coomia/hadoop3.2-datanode:1.0
     container_name: datanode
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
@@ -22,7 +22,7 @@ services:
       - ./hadoop.env
   
   resourcemanager:
-    image: coomia/hadoop3.2-resourcemanager:0.2
+    image: coomia/hadoop3.2-resourcemanager:1.0
     container_name: resourcemanager
     ports:
       - 8088:8088
@@ -32,7 +32,7 @@ services:
       - ./hadoop.env
 
   nodemanager:
-    image: coomia/hadoop3.2-nodemanager:0.2
+    image: coomia/hadoop3.2-nodemanager:1.0
     container_name: nodemanager
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
@@ -40,7 +40,7 @@ services:
       - ./hadoop.env
   
   historyserver:
-    image: coomia/hadoop3.2-historyserver:0.2
+    image: coomia/hadoop3.2-historyserver:1.0
     container_name: historyserver
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
@@ -48,7 +48,7 @@ services:
       - ./hadoop.env
 
   hive-metastore:
-    image: coomia/hive3:0.2
+    image: coomia/hive3:1.0
     container_name: hive-metastore
     volumes:
       - /data/tools:/tools
@@ -60,10 +60,10 @@ services:
     ports:
       - "9083:9083"
   hive-metastore-pg:
-    image: coomia/hive3.1-metastore-pg:0.1
+    image: coomia/hive-metastore-pg:1.0
     container_name: hive-metastore-pg
   hive-server:
-    image: coomia/hive3:0.2
+    image: coomia/hive3:1.0
     container_name: hive-server
     env_file:
       - ./hadoop.env
@@ -103,7 +103,7 @@ services:
     restart: unless-stopped
  
   jobmanager:
-    image: coomia/flink1.14.0:0.2
+    image: coomia/flink1.14:1.0
     container_name: jobmanager
     expose:
       - "6123"
@@ -114,7 +114,7 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
 
   taskmanager:
-    image: coomia/flink1.14.0:0.2
+    image: coomia/flink1.14:1.0
     container_name: taskmanager
     expose:
       - "6121"
