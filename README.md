@@ -169,7 +169,7 @@ For java developers, I provide some tests over the platform. You can fork it fro
 contains flink jobs with set of components, such as kafka, elasticsearch, iceberg, etc.. Source and sink examples are fully inclued.
 
 ## What we've done.
-1. Integration flink 1.14
+1. ~~Integration flink 1.14~~
 2. ~~Integration hive 3.1 (Done)~~
 3. ~~Integration hbase 2.2~~
 4. ~~Integration iceberg~~
