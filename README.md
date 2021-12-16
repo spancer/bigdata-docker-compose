@@ -168,10 +168,10 @@ get 'person','1','info:name'
 For java developers, I provide some tests over the platform. You can fork it from [here](https://github.com/spancer/flink-iceberg-demo), the test project
 contains flink jobs with set of components, such as kafka, elasticsearch, iceberg, etc.. Source and sink examples are fully inclued.
 
-## ToDo
-1. Integration flink 1.12
+## What we've done.
+1. Integration flink 1.14
 2. ~~Integration hive 3.1 (Done)~~
 3. ~~Integration hbase 2.2~~
 4. ~~Integration iceberg~~
-5. Integration alluxio
-6. Integration ozone
+5. ~~Integration alluxio~~
+6. ~~Integration tez~~
