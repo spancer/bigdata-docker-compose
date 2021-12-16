@@ -179,7 +179,7 @@ Altnatively, you can test the intergation with flink.  Just  follow the step:
 3. flink run ../examples/batch/WordCount.jar \
   --input alluxio://alluxio-master:19998/LICENSE \
   --output alluxio://alluxio-master:19998/output
-4. 
+```
 
 ## Run jobs on the docker platform.
 
