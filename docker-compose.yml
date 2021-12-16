@@ -103,7 +103,7 @@ services:
     restart: unless-stopped
  
   jobmanager:
-    image: coomia/flink1.14:1.0
+    image: coomia/flink:1.14
     container_name: jobmanager
     expose:
       - "6123"
@@ -114,7 +114,7 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
 
   taskmanager:
-    image: coomia/flink1.14:1.0
+    image: coomia/flink:1.14
     container_name: taskmanager
     expose:
       - "6121"
