@@ -44,7 +44,7 @@ Install docker-compose:
 
 * HDFS: http://namenode:9870/
 * YARN: http://resourcemanager:8088/
-* ES£ºhttp://elasticsearch:9200/
+* ESÂ£Âºhttp://elasticsearch:9200/
 * Kibana:http://kibana:5601/
 * Presto: http://prestodb:9999/
 * Hbase: http://hbase-master:16010/
@@ -193,3 +193,8 @@ contains flink jobs with set of components, such as kafka, elasticsearch, iceber
 4. ~~Integration iceberg~~
 5. ~~Integration alluxio~~
 6. ~~Integration tez~~
+
+
+### Infrastructure model
+
+![Infrastructure model](.infragenie/infrastructure_model.png)
