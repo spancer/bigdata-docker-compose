@@ -1,0 +1,9 @@
+catalogs: 
+  - name: iceberg
+    type: iceberg
+    default-database: iceberg_db
+    catalog-type: hive
+    warehouse: s3a://lakehouse/iceberg/
+    uri: thrift://hive-metastore:9083
+    clients: 5
+    property-version: 1

@@ -98,6 +98,8 @@ services:
         s3.path.style.access: true
         s3.access-key: minio
         s3.secret-key: minio123
+    volumes:
+      - ./conf/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - ngdbp-network
 
@@ -119,6 +121,8 @@ services:
         s3.path.style.access: true
         s3.access-key: minio
         s3.secret-key: minio123
+    volumes:
+      - ./conf/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - ngdbp-network
 

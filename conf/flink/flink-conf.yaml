@@ -1,0 +1,47 @@
+jobmanager.rpc.address: localhost
+jobmanager.rpc.port: 6123
+jobmanager.bind-host: 0.0.0.0
+
+jobmanager.memory.process.size: 1600m
+
+taskmanager.bind-host: 0.0.0.0
+
+taskmanager.host: localhost
+
+taskmanager.memory.process.size: 1728m
+
+taskmanager.numberOfTaskSlots: 1
+
+parallelism.default: 1
+
+execution.checkpointing.interval: 10s
+execution.checkpointing.tolerable-failed-checkpoints: 10 
+
+state.backend: filesystem
+state.checkpoints.dir: s3://lakehouse/flink/checkpoint
+state.savepoints.dir: s3://lakehouse/flink/savepoints
+state.backend.incremental: true
+
+jobmanager.execution.failover-strategy: region
+
+rest.address: 0.0.0.0
+
+rest.bind-address: 0.0.0.0
+
+
+# S3/Minio access key and secret
+s3.access-key: minio
+s3.secret-key: minio123
+s3.ssl.enabled: false
+s3.path.style.access: true
+s3.endpoint: http://minio:9000
+
+fs.s3a.access.key: minio
+fs.s3a.secret.key: minio123
+
+fs.s3a.endpoint: http://minio:9000
+fs.s3a.path.style.access: true
+
+
+#plugin.classloader.parent-first-patterns.additional: org.apache.iceberg
+
