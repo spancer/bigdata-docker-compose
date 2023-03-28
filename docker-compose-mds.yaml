@@ -1,0 +1,179 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:13-alpine3.15
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - "./data/pg/:/var/lib/postgresql/data"
+    networks:
+      - ngdbp-network
+
+  pgadmin4:
+    image: dpage/pgadmin4:6.5
+    restart: unless-stopped
+    ports:
+      - '8010:80'
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: spencer@coomia.com
+      PGADMIN_DEFAULT_PASSWORD: spencer
+    networks:
+      - ngdbp-network
+
+  hive-metastore:
+    hostname: hive-metastore
+    image: 'coomia/hive-metastore-pg13:1.0'
+    ports:
+      - '9083:9083'
+    volumes:
+      - ./conf/hive-pg/metastore-site.xml:/opt/apache-hive-metastore-3.1.2-bin/conf/metastore-site.xml:ro
+    environment:
+      RDB_HOSTNAME: postgres
+    depends_on:
+      - postgres
+    networks:
+      - ngdbp-network
+  minio:
+    hostname: minio
+    image: 'minio/minio:latest'
+    container_name: minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+     interval: 30s
+     timeout: 20s
+     retries: 3
+    command: ["server", "/data", "--console-address", ":9001"]
+    networks:
+      - ngdbp-network
+
+  mc:
+    depends_on:
+      - minio
+    image: minio/mc
+    container_name: mc
+    environment:
+      - MINIO_ACCESS_KEY=minio
+      - MINIO_SECRET_KEY=minio123
+    networks:
+      - ngdbp-network
+    volumes:
+      - ./data:/tmp/data
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc config host add minio http://minio:9000 minio minio123) do echo '...waiting...' && sleep 1; done;
+      /usr/bin/mc rm -r --force minio/lakehouse;
+      /usr/bin/mc mb minio/lakehouse;
+      /usr/bin/mc policy set public minio/lakehouse;
+      /usr/bin/mc cp -r /tmp/data/* minio/lakehouse;
+      exit 0; " 
+
+
+  jobmanager:
+    image: coomia/flink-iceberg-minio:1.16.1-1.1.0-1.0
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager        
+        state.backend: filesystem
+        state.checkpoints.dir: s3://flink/checkpoint
+        s3.endpoint: http://minio:9000
+        s3.path.style.access: true
+        s3.access-key: minio
+        s3.secret-key: minio123
+    networks:
+      - ngdbp-network
+
+  taskmanager:
+    image: coomia/flink-iceberg-minio:1.16.1-1.1.0-1.0
+    links:
+      - jobmanager
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 1        
+        state.backend: filesystem
+        state.checkpoints.dir: s3://flink/checkpoint
+        s3.endpoint: http://minio:9000
+        s3.path.style.access: true
+        s3.access-key: minio
+        s3.secret-key: minio123
+    networks:
+      - ngdbp-network
+
+  kafka:
+    image: wurstmeister/kafka:2.12-2.5.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: "kafka"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "arkuser:1:1, arkevent:1:1"
+      KAFKA_TRANSACTION_MAX_TIMEOUT_MS: "7200000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ngdbp-network
+
+  zookeeper:
+    image: coomia/zookeeper:0.1
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    networks:
+      - ngdbp-network
+
+  trinodb:
+    image: 'coomia/trinodb:395'
+    hostname: trinodb
+    ports:
+      - '8080:8080'
+      - '8443:8443'
+    volumes:
+      - ./conf/trino/etc:/etc/trino
+      - ./conf/trino/certs/trino.pass:/trino.pass
+      - ./conf/trino/certs/trino_key_and_cert.pem:/trino_key_and_cert.pem
+      - ./conf/trino/certs/trino_key.pem:/trino_key.pem
+      - ./conf/trino/certs/trino_cert.pem:/trino_cert.pem
+    depends_on:
+      minio:
+        condition: service_healthy
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    networks:
+      - ngdbp-network
+
+volumes:
+  minio-data:
+    driver: local
+
+networks:
+  ngdbp-network:
+    driver: bridge
