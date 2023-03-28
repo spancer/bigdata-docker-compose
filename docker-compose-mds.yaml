@@ -84,7 +84,7 @@ services:
 
 
   jobmanager:
-    image: coomia/flink-iceberg-minio:1.16.1-1.1.0-1.0
+    image: coomia/flink-iceberg-minio:1.16.1-1.1.0-2.0
     ports:
       - "8081:8081"
     command: jobmanager
@@ -105,7 +105,7 @@ services:
       - ngdbp-network
 
   taskmanager:
-    image: coomia/flink-iceberg-minio:1.16.1-1.1.0-1.0
+    image: coomia/flink-iceberg-minio:1.16.1-1.1.0-2.0
     links:
       - jobmanager
     depends_on:
