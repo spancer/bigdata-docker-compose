@@ -100,6 +100,7 @@ services:
         s3.secret-key: minio123
     volumes:
       - ./conf/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
+      - ./conf/flink/sql-client-defaults.yaml:/opt/flink/conf/sql-client-defaults.yaml
     networks:
       - ngdbp-network
 
@@ -123,6 +124,7 @@ services:
         s3.secret-key: minio123
     volumes:
       - ./conf/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
+      - ./conf/flink/sql-client-defaults.yaml:/opt/flink/conf/sql-client-defaults.yaml
     networks:
       - ngdbp-network
 
