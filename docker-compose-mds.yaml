@@ -1,45 +1,19 @@
 version: '3'
 services:
-  postgres:
-    image: postgres:13-alpine3.15
-    restart: unless-stopped
-    ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - "./data/pg/:/var/lib/postgresql/data"
+  rest:
+    image: coomia/iceberg-rest-catalog:0.1
+    container_name: iceberg-rest
     networks:
       - ngdbp-network
-
-  pgadmin4:
-    image: dpage/pgadmin4:6.5
-    restart: unless-stopped
     ports:
-      - '8010:80'
-    depends_on:
-      - postgres
+      - 8181:8181
     environment:
-      PGADMIN_DEFAULT_EMAIL: spencer@coomia.com
-      PGADMIN_DEFAULT_PASSWORD: spencer
-    networks:
-      - ngdbp-network
-
-  hive-metastore:
-    hostname: hive-metastore
-    image: 'coomia/hive-metastore-pg13:1.0'
-    ports:
-      - '9083:9083'
-    volumes:
-      - ./conf/hive-pg/metastore-site.xml:/opt/apache-hive-metastore-3.1.2-bin/conf/metastore-site.xml:ro
-    environment:
-      RDB_HOSTNAME: postgres
-    depends_on:
-      - postgres
-    networks:
-      - ngdbp-network
+      - AWS_REGION=us-west-2
+      - S3_ACCESS_KEY_ID=minio
+      - S3_SECRET_ACCESS_KEY=minio123
+      - CATALOG_WAREHOUSE=s3a://lakehouse/iceberg
+      - CATALOG_IO__IMPL=org.apache.iceberg.aws.s3.S3FileIO
+      - CATALOG_S3_ENDPOINT=http://minio:9000
   minio:
     hostname: minio
     image: 'minio/minio:latest'
@@ -83,73 +57,19 @@ services:
       exit 0; " 
 
 
-  jobmanager:
-    image: coomia/flink-iceberg-minio:1.16.1-1.1.0-2.0
+  pyflink-iceberg:
+    image: coomia/pyflink-iceberg:1.0
+    container_name: pyflink-iceberg
     ports:
-      - "8081:8081"
-    command: jobmanager
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager        
-        state.backend: filesystem
-        state.checkpoints.dir: s3://flink/checkpoint
-        s3.endpoint: http://minio:9000
-        s3.path.style.access: true
-        s3.access-key: minio
-        s3.secret-key: minio123
+      - "8888:8888"
     volumes:
-      - ./conf/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
-      - ./conf/flink/sql-client-defaults.yaml:/opt/flink/conf/sql-client-defaults.yaml
-    networks:
-      - ngdbp-network
-
-  taskmanager:
-    image: coomia/flink-iceberg-minio:1.16.1-1.1.0-2.0
-    links:
-      - jobmanager
-    depends_on:
-      - jobmanager
-    command: taskmanager
+      - ./workspace:/workspace
     environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 1        
-        state.backend: filesystem
-        state.checkpoints.dir: s3://flink/checkpoint
-        s3.endpoint: http://minio:9000
-        s3.path.style.access: true
-        s3.access-key: minio
-        s3.secret-key: minio123
-    volumes:
-      - ./conf/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
-      - ./conf/flink/sql-client-defaults.yaml:/opt/flink/conf/sql-client-defaults.yaml
-    networks:
-      - ngdbp-network
-
-  kafka:
-    image: wurstmeister/kafka:2.12-2.5.0
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: "kafka"
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "arkuser:1:1, arkevent:1:1"
-      KAFKA_TRANSACTION_MAX_TIMEOUT_MS: "7200000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - ngdbp-network
-
-  zookeeper:
-    image: coomia/zookeeper:0.1
-    container_name: zookeeper
-    ports:
-      - 2181:2181
+      - AWS_REGION=us-west-2
+      - S3_ACCESS_KEY_ID=minio
+      - S3_SECRET_ACCESS_KEY=minio123
+      - FLINK_HOME=/opt/flink
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
     networks:
       - ngdbp-network
 
