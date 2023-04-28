@@ -8,7 +8,8 @@ services:
       - ./conf/fe.conf:/doris-fe/conf/fe.conf
       - ./log/fe:/doris-fe/log
     ports:
-      - "8030:8030"
+      - 8030:8030
+      - 9030:9030
     environment:
       - CLUSTER_ID=doris-cluster
       - ROLE=fe
@@ -45,8 +46,9 @@ services:
     container_name: pulsar
     restart: always
     ports:
-      - "6650:6650"
-      - "8080:8080"
+      - 8040:8040
+      - 9000:9000
+      - 9050:9050
     environment:
       - PULSAR_MEM=1g
     networks:
@@ -57,52 +59,3 @@ services:
 networks:
   ngdbp-network:
     driver: bridge
-
-
-version: '3'
-services:
-  docker-fe:
-    image: apache/doris:1.2.2-fe-x86_64
-    container_name: "doris-fe"
-    tty: true
-    hostname: "fe"
-    restart: always
-    ports:
-      - 8030:8030
-      - 9030:9030
-    networks:
-      doris_net:
-        ipv4_address: 172.20.80.2
-  docker-be:
-    image: "freeoneplus/apache-doris:be-1.1.2-lts-20220920-x86"
-    container_name: "doris-be"
-    tty: true
-    hostname: "fe"
-    restart: always
-    ports:
-      - 8040:8040
-      - 9000:9000
-      - 9050:9050
-    networks:
-      doris_net:
-        ipv4_address: 172.20.80.3
-  register:
-    image: "freeoneplus/apache-doris:register"
-    container_name: "doris-register"
-    hostname: "register"
-    privileged: true
-    command: ["sh","-c","/root/register.sh"]
-    depends_on:
-      - docker-fe
-      - docker-be
-    volumes: 
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      doris_net:
-        ipv4_address: 172.20.80.4
-networks:
-  doris_net:
-    ipam:
-      config:
-      - subnet: 172.20.80.0/16
