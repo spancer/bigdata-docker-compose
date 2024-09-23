@@ -44,7 +44,7 @@ Install docker-compose:
 
 * HDFS: http://namenode:9870/
 * YARN: http://resourcemanager:8088/
-* ES£ºhttp://elasticsearch:9200/
+* ES: http://elasticsearch:9200/
 * Kibana:http://kibana:5601/
 * Presto: http://prestodb:9999/
 * Hbase: http://hbase-master:16010/
